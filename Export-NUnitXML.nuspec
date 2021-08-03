@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>Export-NUnitXml</id>
+        <version>$version$</version>
+        <authors>Mathieu BUISSON</authors>
+        <owners>Mathieu BUISSON</owners>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Create NUnitXml result for PSSA</description>
+        <copyright>Copyright © Mathieu BUISSON</copyright>
+        <tags>Export-NUnitXml</tags>
+	</metadata>
+  <files>
+    <file src="Export-NUnitXml\**\*.*" target="\Export-NUnitXml"/>
+  </files>
+</package>
