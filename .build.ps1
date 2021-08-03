@@ -3,7 +3,7 @@ param()
 Set-StrictMode -Version Latest
 $ProgressPreferenceBackup = $ProgressPreference
 
-$script:version = '1.0-local'
+$script:version = '1.0.0'
 $script:rootDirectory = $null
 $script:distDir = Join-Path -Path $PSScriptRoot -ChildPath "\_dist\"
 
