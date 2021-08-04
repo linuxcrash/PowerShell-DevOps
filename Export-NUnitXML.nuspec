@@ -11,6 +11,6 @@
         <tags>Export-NUnitXml</tags>
 	</metadata>
   <files>
-    <file src="Export-NUnitXml\**\*.*" target="\Export-NUnitXml"/>
+    <file src="Export-NUnitXml\**\*.*" target=""/>
   </files>
 </package>
