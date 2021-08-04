@@ -39,3 +39,10 @@ _TeamCity*
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
+
+# Temporary build folders
+_PSModules/
+_dist/
+
+# DotNetBuild File
+dotnet-install.ps1
