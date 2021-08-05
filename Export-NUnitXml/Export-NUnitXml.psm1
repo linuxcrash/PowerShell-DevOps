@@ -14,7 +14,16 @@
         [Microsoft.Windows.PowerShell.ScriptAnalyzer.Generic.DiagnosticRecord[]]$ScriptAnalyzerResult,
 
         [Parameter(Mandatory, Position=1)]
-        [string]$Path
+        [string]$Path,
+
+        [Parameter()]
+        [switch]$failOnInformation,
+
+        [Parameter()]
+        [switch]$failOnWarning,
+
+        [Parameter()]
+        [switch]$failOnError
     )
 
     $TotalNumber = If ($ScriptAnalyzerResult) { $ScriptAnalyzerResult.Count -as [string] } Else { '1' }
@@ -85,15 +94,54 @@
             $Text = [System.Security.SecurityElement]::Escape($Result.Extent.Text)
             $Severity = [System.Security.SecurityElement]::Escape($Result.Severity)
 
+            $successFlag = 'True'
+            $resultFlag = 'Success'
+
+            # Set the test case result flags appropriately
+            Switch ($Severity) {
+                'Information' {
+                    if ($failOnInformation) {
+                        $successFlag = 'False'
+                        $resultFlag = 'Failure'
+                    }
+                    Break
+                }
+                'Warning' {
+                    if ($failOnWarning) {
+                        $successFlag = 'False'
+                        $resultFlag = 'Failure'
+                    }
+                    Break
+                }
+                'Error' {
+                    if ($failOnError) {
+                        $successFlag = 'False'
+                        $resultFlag = 'Failure'
+                    }
+                    Break
+                }
+            }
+
             $TestCase = @"
-          <test-case description="$TestDescription" name="$TestName" time="0.0" asserts="0" success="False" result="Failure" executed="True">
+          <test-case description="$TestDescription" name="$TestName" time="0.0" asserts="0" success="$successFlag" result="$resultFlag" executed="True">
+            <properties>
+              <property name="Severity" value="$Severity" />
+            </properties>`n
+"@
+            # Add the failure node only if we failed the test.
+            if ($resultFlag -eq 'Failure') {
+                $TestCase += @"
             <failure>
               <message>$($Result.Message)</message>
               <stack-trace>at line: $($Line) in $($ScriptPath)
-        $($Line): $($Text)
- Rule severity : $($Severity)
+                $($Line): $($Text)
+                Rule severity : $($Severity)
               </stack-trace>
             </failure>
+"@
+            }
+            # Add the closing node for the test case element.
+            $TestCase += @"
           </test-case>`n
 "@
 
