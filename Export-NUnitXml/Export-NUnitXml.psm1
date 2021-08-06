@@ -35,13 +35,24 @@
     $MachineName = $env:COMPUTERNAME
     $Cwd = $pwd.Path
     $UserDomain = $env:USERDOMAIN
-    $OS = Get-CimInstance -ClassName Win32_OperatingSystem
-    $Platform = $OS.Caption
-    $OSVersion = $OS.Version
+    $Platform = 'Unknown'
+    $OSVersion = 'Unknown'
     $ClrVersion = 'Unknown'
     $CurrentCulture = (Get-Culture).Name
     $UICulture = (Get-UICulture).Name
     
+    If ($PSVersionTable.PSVersion -gt [System.Version]5.2) {
+        # Works for Windows and Linux with PS Core
+        $Platform = $PSVersionTable.Platform
+        $OSVersion = $PSVersionTable.OS
+    }
+    Else {
+        # Works for PS 5.1 on Windows
+        $OS = Get-CimInstance -ClassName Win32_OperatingSystem
+        $Platform = $OS.Caption
+        $OSVersion = $OS.Version
+    }
+
     # This has been deprecated with PS Core and is only kept for compatbility
     # See https://github.com/PowerShell/PowerShell/issues/1395
     if ($PSVersionTable.CLRVersion) {
