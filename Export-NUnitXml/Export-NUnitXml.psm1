@@ -85,11 +85,19 @@
         $Body = [string]::Empty
         Foreach ( $Result in $ScriptAnalyzerResult ) {
 
+            # Setting Line to 0 as PSSA generates output that is not specific to a line.
+            if (-not $Result.Line) {
+                $reportedLine = 0
+            }
+            else {
+                $reportedLine = $Result.Line
+            }
+
             $TestDescription = "Rule name : $($Result.RuleName)"
-            $TestName = "PSScriptAnalyzer.{0} - {1} - Line {2}" -f $TestDescription, $($Result.ScriptName), $($Result.Line.ToString())
+            $TestName = "PSScriptAnalyzer.{0} - {1} - Line {2}" -f $TestDescription, $($Result.ScriptName), $reportedLine
 
             # Need to Escape these otherwise we can end up with an invalid XML if the Stacktrace has non XML friendly chars like &, etc
-            $Line = [System.Security.SecurityElement]::Escape($Result.Line)
+            $Line = [System.Security.SecurityElement]::Escape($reportedLine)
             $ScriptPath = [System.Security.SecurityElement]::Escape($Result.ScriptPath)
             $Text = [System.Security.SecurityElement]::Escape($Result.Extent.Text)
             $Severity = [System.Security.SecurityElement]::Escape($Result.Severity)
