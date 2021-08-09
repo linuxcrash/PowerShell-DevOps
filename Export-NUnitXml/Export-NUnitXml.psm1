@@ -41,13 +41,16 @@
     $CurrentCulture = (Get-Culture).Name
     $UICulture = (Get-UICulture).Name
     
+    Write-output "PSVersion: $($PSVersionTable.PSVersion)"
     If ($PSVersionTable.PSVersion -gt [System.Version]5.2) {
         # Works for Windows and Linux with PS Core
+        Write-Output "Get Version from PSVersionTable"
         $Platform = $PSVersionTable.Platform
         $OSVersion = $PSVersionTable.OS
     }
     Else {
         # Works for PS 5.1 on Windows
+        Write-Output "Get Version from CIMInstance"
         $OS = Get-CimInstance -ClassName Win32_OperatingSystem
         $Platform = $OS.Caption
         $OSVersion = $OS.Version
@@ -60,8 +63,23 @@
     }
 
     Switch ($ScriptAnalyzerResult) {
-        $Null { $TestResult = 'Success'; $TestSuccess = 'True'; Break}
-        Default { $TestResult = 'Failure'; $TestSuccess = 'False'}
+        $Null {
+            $TestResult = 'Success'; $TestSuccess = 'True';
+            Break
+        }
+        Default {
+            $TestResult = 'Success'; $TestSuccess = 'True'
+            if ($failOnInformation -and $($ScriptAnalyzerResult.Severity -eq 'Information')) {
+                $TestResult = 'Failure'; $TestSuccess = 'False'
+            }
+            if ($failOnWarning -and $($ScriptAnalyzerResult.Severity -eq 'Warning')) {
+                $TestResult = 'Failure'; $TestSuccess = 'False'
+            }
+            if ($failOnError -and $($ScriptAnalyzerResult.Severity -eq 'Error')) {
+                $TestResult = 'Failure'; $TestSuccess = 'False'
+            }
+            Break
+        }
     }
 
     $Header = @"
